@@ -4,16 +4,17 @@ import face_recognition
 import os
 from datetime import datetime
 
-path='imageAttendance'
+path='imageBasic'
 images=[]
 classnames=[]
 myList=os.listdir(path)
-print(myList)
+print(myList)#with extension
+
 for cls in myList:
     curImg=cv2.imread(f'{path}/{cls}')
     images.append(curImg)
     classnames.append(os.path.splitext(cls)[0])
-print(classnames)
+print(classnames)#without extension
 
 def findencodings(images):
     encodeList=[]
@@ -36,10 +37,6 @@ def markAttendance(name):
             dtString=now.strftime('%H:%M:%S')
             f.writelines(f'\n{name},{dtString}')
 
-
-
-
-
 encodeListKnown=findencodings(images)
 print('Encoding Complete')
 
@@ -55,12 +52,10 @@ while True:
     for enf,floc in zip(encodeCurr,faceCurr):
         matches=face_recognition.compare_faces(encodeListKnown,enf)
         faceDis=face_recognition.face_distance(encodeListKnown,enf)
-        #print(faceDis)
         matchIndex=np.argmin(faceDis)
 
         if matches[matchIndex]:
             name=classnames[matchIndex].upper()
-            #print(name)
             y1,x2,y2,x1=floc
             y1, x2, y2, x1 =y1*4,x2*4,y2*4,x1*4
             cv2.rectangle(img,(x1,y1),(x2,y2),(0,255,0),2)
